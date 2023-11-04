@@ -1,0 +1,1 @@
+Host connect Kong: http://kong:8001
