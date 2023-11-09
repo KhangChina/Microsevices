@@ -10,12 +10,8 @@ export class ProductsController {
 
   @Post()
   async create(@Body() createProductDto: CreateProductDto) {
-    try {
       const data = await this.productsService.create(createProductDto);
       return { statusCode: 201, message: 'Create products success', data };
-    } catch (error) {
-      throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
   }
   @Get()
   async findAll(@Query() query) {

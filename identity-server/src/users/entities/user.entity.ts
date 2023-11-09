@@ -12,7 +12,7 @@ export class User {
     product: Product;
 
     @RelationId((user: User) => user.product)
-    productID: number;
+    productID: string;
     
     @Column({ default: ""})
     password: string;

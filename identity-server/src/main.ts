@@ -26,7 +26,7 @@ async function bootstrap() {
     explorer: false,
     customCss: fs.readFileSync(join(__dirname, '..', 'public/theme-swagger-3/theme-feeling-blue.css'), 'utf8'),
     customSiteTitle: 'API Documentation',
-    customfavIcon: 'favicon.png'
+    customfavIcon: 'favicon.png',
   };
   //Cấu hình đường dẫn đến api document
   SwaggerModule.setup('api-document', app, document, options);
