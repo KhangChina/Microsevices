@@ -1,34 +1,47 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Production')
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly productsService: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) { }
 
   @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+  async create(@Body() createProductDto: CreateProductDto) {
+    try {
+      const data = await this.productsService.create(createProductDto);
+      return { statusCode: 201, message: 'Create products success', data };
+    } catch (error) {
+      throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
-
   @Get()
-  findAll() {
-    return this.productsService.findAll();
+  async findAll(@Query() query) {
+    const search: string = query.search ? query.search : ""
+    const page: number = query.page > 0 ? query.page : 1
+    const limit: number = query.per_page ? query.per_page : 20
+    const data = await this.productsService.findAll(page, limit, search);
+    return { statusCode: 200, message: 'Get data success', data: data };
   }
-
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productsService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const data = await this.productsService.findOne(id);
+    if (data)
+      return { statusCode: 200, message: 'Get data success', data: data };
+    return { statusCode: 404, message: 'Get data not found' };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productsService.update(+id, updateProductDto);
+  async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
+    const data = await this.productsService.update(+id, updateProductDto);
+    return { statusCode: 200, message: 'update data success', data: data };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(+id);
+  async remove(@Param('id') id: string) {
+    const data = await this.productsService.remove(+id);
+    return { statusCode: 200, message: 'Delete data success', data: data };
   }
 }

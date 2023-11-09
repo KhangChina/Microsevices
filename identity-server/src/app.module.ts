@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import 'dotenv/config'
+import { User } from './users/entities/user.entity';
+import { Product } from './products/entities/product.entity';
 @Module({
   imports: [TypeOrmModule.forRoot({
     name: process.env.DATABASE_PROVIDER_NAME,
