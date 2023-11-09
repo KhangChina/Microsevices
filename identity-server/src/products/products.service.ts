@@ -9,7 +9,11 @@ import { paginate } from 'nestjs-typeorm-paginate';
 export class ProductsService {
   @InjectRepository(Product) private productRepository: Repository<Product>
   async create(createProductDto: CreateProductDto) {
-    return await this.productRepository.save(createProductDto)
+    try {
+      return await this.productRepository.save(createProductDto)
+    } catch (error) {
+      throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   findAll(page: number, limit: number, search: string) {
