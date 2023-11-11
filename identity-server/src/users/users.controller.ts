@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { ProductsService } from 'src/products/products.service';
+import { JwtGuard } from 'src/guards/jwt-access.guard';
 @ApiTags('Users')
+@UseGuards(JwtGuard)
 @Controller('user')
 export class UsersController {
   constructor(
@@ -65,4 +67,5 @@ export class UsersController {
     const data =  this.usersService.remove(+id);
     return { statusCode: 200, message: 'Delete data success', data };
   }
+  
 }

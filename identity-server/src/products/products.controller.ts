@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { JwtGuard } from 'src/guards/jwt-access.guard';
 @ApiTags('Production')
+@UseGuards(JwtGuard)
 @Controller('product')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }

@@ -18,7 +18,7 @@ import 'dotenv/config'
     entities: ["dist/**/*.entity{.ts,.js}"],
     synchronize: true, //Create new tb and lose data
     logging:  false,
-    autoLoadEntities: true
+    autoLoadEntities: true,
   }),
   UsersModule, ProductsModule, AuthenticationModule, UtilityModule],
   controllers: [AppController],

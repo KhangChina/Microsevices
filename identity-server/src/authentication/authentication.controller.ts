@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus,Request, UseGuards } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { UsersService } from 'src/users/users.service';
 import { UtilityService } from 'src/utility/utility.service';
@@ -9,6 +9,7 @@ import { RegisterDto } from './dto/register.dto';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { ProductsService } from 'src/products/products.service';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtGuard } from 'src/guards/jwt-access.guard';
 @ApiTags('Authentication')
 @Controller('authentication')
 export class AuthenticationController {
@@ -52,11 +53,11 @@ export class AuthenticationController {
     //Step 2: Gen token
     const accessToken = this.jwtService.sign(payload, {
       expiresIn: authConstants.jwt.expirationTime.accessToken,
-      secret: authConstants.jwt.secrets.accessToken,
+      secret: authConstants.jwt.secrets.accessToken
     });
     const refreshToken = this.jwtService.sign(payload, {
       expiresIn: authConstants.jwt.expirationTime.refreshToken,
-      secret: authConstants.jwt.secrets.refreshToken,
+      secret: authConstants.jwt.secrets.refreshToken
     });
 
     const data = {
@@ -106,4 +107,10 @@ export class AuthenticationController {
 
   }
 
+  @Get('identification')
+  @UseGuards(JwtGuard)
+  async getIdentification(@Request() req)
+  {
+    console.log(req.user)
+  }
 }

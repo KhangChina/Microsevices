@@ -1,13 +1,13 @@
 const authConstants = {
     jwt: {
-      secret: 'superSecurity',
+      secret: 'XkoVE93o4qLrYZQcj8ZLuOxOHSi0nHuk13BOVyOK8R82fiFeaQ',
       expirationTime: {
         accessToken: '1d',
-        refreshToken: '7d'//'7d',
+        refreshToken: '7d',
       },
       secrets: {
-        accessToken: '283f01ccce922bcc2399e7f8ded981285963cec349daba382eb633c1b3a5f282',
-        refreshToken: 'c15476aec025be7a094f97aac6eba4f69268e706e603f9e1ec4d815396318c86',
+        accessToken: '4R9p6aMoNwGp3VKQLidm9PM59wo1Vr5SU6mOXswuhiuGTDKn7C',
+        refreshToken: '4694YvkAnJZpi3YP7Og0Kgjj4dG83Fa0tW0DjvDy7hL8zBxPCY',
       },
     },
     mailer: {

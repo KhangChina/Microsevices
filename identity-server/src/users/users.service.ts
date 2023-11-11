@@ -18,7 +18,6 @@ export class UsersService {
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
   async findAll(page: number, limit: number, search: string) {
     try {
       const queryBuilder = this.userRepository.createQueryBuilder('u')
@@ -36,7 +35,6 @@ export class UsersService {
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
   async findOne(ID: number) {
     try {
       return await this.userRepository.findOne({
@@ -118,7 +116,6 @@ export class UsersService {
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
   async checkEmail(email: string)
   {
     try {
