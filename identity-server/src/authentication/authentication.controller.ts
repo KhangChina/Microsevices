@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus,Request, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus,Request, UseGuards, UseInterceptors } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { UsersService } from 'src/users/users.service';
 import { UtilityService } from 'src/utility/utility.service';
@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 import { RegisterDto } from './dto/register.dto';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { ProductsService } from 'src/products/products.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/guards/jwt-access.guard';
 @ApiTags('Authentication')
 @Controller('authentication')
@@ -109,8 +109,10 @@ export class AuthenticationController {
 
   @Get('identification')
   @UseGuards(JwtGuard)
+  @ApiBearerAuth()
   async getIdentification(@Request() req)
   {
-    console.log(req.user)
+    const data = await this.userService.findOne(req.user.ID)
+    return { statusCode: 200, message: 'Create user success', data };
   }
 }

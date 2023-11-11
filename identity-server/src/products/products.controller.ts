@@ -2,10 +2,11 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpException
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/guards/jwt-access.guard';
 @ApiTags('Production')
 @UseGuards(JwtGuard)
+@ApiBearerAuth()
 @Controller('product')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }

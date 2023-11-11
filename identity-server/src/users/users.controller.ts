@@ -2,11 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query, UseGuard
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { ProductsService } from 'src/products/products.service';
 import { JwtGuard } from 'src/guards/jwt-access.guard';
 @ApiTags('Users')
+@ApiBearerAuth()
 @UseGuards(JwtGuard)
 @Controller('user')
 export class UsersController {
