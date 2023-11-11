@@ -1,0 +1,41 @@
+version: '3.9'
+services:
+  # app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   volumes:
+  #     - ./src:/usr/src/app/src
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - idetity-networks
+  db:
+    image: mariadb:10.6
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    env_file:
+      - .env
+    volumes:
+      - ./initdb:/docker-entrypoint-initdb.d
+      #- ./dbdata:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - idetity-networks
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.1
+    restart: always
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    networks:
+      - idetity-networks
+networks:
+  idetity-networks:
