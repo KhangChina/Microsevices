@@ -1,18 +1,15 @@
 import { UserStatusEnum } from "src/decorators/userStatus.decorator";
 import { Product } from "src/products/entities/product.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, RelationId, UpdateDateColumn } from "typeorm";
-@Entity({ name: "users" })
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, RelationId, UpdateDateColumn } from "typeorm";
+@Entity({ name: "user" })
 export class User {
 
     @PrimaryGeneratedColumn()
     ID: number;
 
-    @ManyToOne(() => Product, (product) => product.users)
-    @JoinColumn({ name: 'productID' })
-    product: Product;
-
-    @RelationId((user: User) => user.product)
-    productID: string;
+    @ManyToMany(() => Product)
+    @JoinTable()
+    products: Product[]
     
     @Column({ default: ""})
     password: string;

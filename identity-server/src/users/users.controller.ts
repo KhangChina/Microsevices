@@ -2,38 +2,43 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query } from '@
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiHeader, ApiTags } from '@nestjs/swagger';
+import { ApiHeader, ApiQuery, ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { ProductsService } from 'src/products/products.service';
 @ApiTags('Users')
-@Controller('users')
+@Controller('user')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly productService: ProductsService,
   ) { }
 
-  @ApiHeader({
-    name: 'client-id',
-    description: 'Client ID',
-    required: true
-  })
-  @Post()
-  async create(@Body() createUserDto: CreateUserDto, @Req() request: Request) {
+  // @ApiHeader({
+  //   name: 'client-id',
+  //   description: 'Client ID',
+  //   required: true
+  // })
+
+  @Post('product/:productsID')
+  async create(@Body() createUserDto: CreateUserDto, @Req() request: Request,@Param('productsID') productsID: string) {
     //Step 1: Get Client ID
-    const clientID = request.headers['client-id'];
-    const productID = clientID
+    const productID = productsID
     //Step 2: Check client ID
     const dataProducts = await this.productService.findOne(productID)
     if (!dataProducts) {
-      return { statusCode: 404, message: 'Products not found'};
+      return { statusCode: 404, message: 'Products not found' };
     }
+    
     //Step 3: Create hash password
     createUserDto.password = await bcrypt.hash(createUserDto.password, 10)
     //Step 3: Save user
-    const data = await this.usersService.create(createUserDto, productID);
-    return { statusCode: 201, message: 'Create products success', data };
+    const data = await this.usersService.create(createUserDto, dataProducts);
+    return { statusCode: 201, message: 'Create user success', data };
   }
+  
+  @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'per_page', required: false })
   @Get()
   async findAll(@Query() query) {
     const search: string = query.search ? query.search : ""
@@ -44,17 +49,20 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const data = await this.usersService.findOne(+id);
+    return { statusCode: 200, message: 'Get one data success', data };
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    const data = await this.usersService.update(+id, updateUserDto);
+    return { statusCode: 200, message: 'Update data success', data };
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    const data =  this.usersService.remove(+id);
+    return { statusCode: 200, message: 'Delete data success', data };
   }
 }

@@ -2,9 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, HttpException
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 @ApiTags('Production')
-@Controller('products')
+@Controller('product')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) { }
 
@@ -13,6 +13,10 @@ export class ProductsController {
       const data = await this.productsService.create(createProductDto);
       return { statusCode: 201, message: 'Create products success', data };
   }
+
+  @ApiQuery({ name: 'search', required: false })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'per_page', required: false })
   @Get()
   async findAll(@Query() query) {
     const search: string = query.search ? query.search : ""

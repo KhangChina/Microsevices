@@ -4,12 +4,11 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ProductsModule } from './products/products.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthenticationModule } from './authentication/authentication.module';
+import { UtilityModule } from './utility/utility.module';
 import 'dotenv/config'
-import { User } from './users/entities/user.entity';
-import { Product } from './products/entities/product.entity';
 @Module({
   imports: [TypeOrmModule.forRoot({
-    name: process.env.DATABASE_PROVIDER_NAME,
     type: 'mysql',
     host: process.env.MYSQL_HOST,
     port: +process.env.MYSQL_PORT,
@@ -21,7 +20,7 @@ import { Product } from './products/entities/product.entity';
     logging:  false,
     autoLoadEntities: true
   }),
-  UsersModule, ProductsModule],
+  UsersModule, ProductsModule, AuthenticationModule, UtilityModule],
   controllers: [AppController],
   providers: [AppService],
 })
