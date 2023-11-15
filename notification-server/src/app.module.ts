@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OtpModule } from './otp/otp.module';
 import { TemplateModule } from './template/template.module';
+import { MailModule } from './mail/mail.module';
 import 'dotenv/config'
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -17,7 +18,7 @@ import 'dotenv/config'
     synchronize: true, //Create new tb and lose data
     logging:  false,
     autoLoadEntities: true,
-  }), OtpModule, TemplateModule,
+  }), OtpModule, TemplateModule, MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,23 +1,20 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty,IsString,IsNumber, IsEnum, IsOptional } from "class-validator";
+import { IsNotEmpty,IsString,IsNumber, IsEnum, IsOptional, MAX, MaxLength, MinLength, Min, Max, IsEmail } from "class-validator";
 import { SendTypeEnum } from "src/decorators/send-type.decorator";
 
 
 export class InputOtpDto {
 
-    @IsEnum(SendTypeEnum, { each: true })
-    @IsOptional()
-    @IsNotEmpty()
-    @ApiProperty({ enum: SendTypeEnum })
-    type: SendTypeEnum;
-
-    @ApiProperty({ type: String, example: "khang.nguyen@htgsoft.com or +84964440776" })
+    @ApiProperty({ type: String, example: "khang.nguyen@htgsoft.com" })
     @IsNotEmpty()
     @IsString()
+    @IsEmail()
     value: string;
 
     @ApiProperty({ type: Number ,example: 6})
     @IsNotEmpty()
     @IsNumber()
+    @Min(3)
+    @Max(9)
     numCode: number;
 }

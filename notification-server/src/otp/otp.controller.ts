@@ -1,12 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpException } from '@nestjs/common';
 import { OtpService } from './otp.service';
 import { CreateOtpDto } from './dto/create-otp.dto';
-import { UpdateOtpDto } from './dto/update-otp.dto';
 import { InputOtpDto } from './dto/input-otp.dto';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
+import { MailService } from 'src/mail/mail.service';
+import { OtpTypeEnum } from 'src/decorators/otp-type.decorator';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { count } from 'console';
 
+@ApiTags('OTP')
 @Controller('otp')
 export class OtpController {
-  constructor(private readonly otpService: OtpService) {}
+  constructor(
+    private readonly otpService: OtpService,
+    private readonly mailService: MailService
+  ) { }
 
   @Post()
   create(@Body() createOtpDto: CreateOtpDto) {
@@ -20,34 +28,69 @@ export class OtpController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.otpService.findOne(+id);
+    //return this.otpService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOtpDto: UpdateOtpDto) {
-    return this.otpService.update(+id, updateOtpDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.otpService.remove(+id);
-  }
   @Post('mail')
-  sendOTPMail(@Body() otpInput: InputOtpDto)
-  {
-    
-    //Check
-    let numCode = 6
-    if(otpInput.numCode)
-    {
-      numCode
+  async sendOTPMail(@Body() otpInput: InputOtpDto) {
+    //Step 1: Check sended mail
+    let mail_ex = await this.otpService.findOneBlock(otpInput.value, OtpTypeEnum.register, 5)
+    if (mail_ex) {
+      throw new HttpException(`Block email ${mail_ex.value} !`, HttpStatus.BAD_REQUEST);
     }
-    const code = Math.floor(Math.random() * 1000000000);
-    const code_send = code.toString().padStart(otpInput.numCode, '0');
-    // const check = await this.mailService.sendOTPEmail(createOtpDto.value, code);
-    // if (!check) {
-    //   throw new HttpException(`${createOtpDto.value} malformed or non-existent email`, HttpStatus.BAD_REQUEST);
-    // }
-    // return {otpInput}
+    //Step 2: Check mail verify
+    mail_ex = await this.otpService.findOneVerifyOTP(otpInput.value, OtpTypeEnum.register)
+    if(mail_ex)
+    {
+      throw new HttpException(`Email ${mail_ex.value} verified !`, HttpStatus.BAD_REQUEST);
+    }
+    //Step 3: Check send
+    let count = 0
+    mail_ex = await this.otpService.findOne(otpInput.value, OtpTypeEnum.register)
+    if (mail_ex) {
+      count = mail_ex.count++
+    }
+    //Step 2: Check email validate
+    let numCode = 6
+    if (otpInput.numCode) {
+      numCode = otpInput.numCode
+    }
+
+    const code_send = this.generateOTP(numCode);
+    const check = await this.mailService.sendOTPEmail('OTP Verify', './otp', otpInput.value, code_send);
+    if (!check) {
+      throw new HttpException(`${otpInput.value} malformed or non-existent email`, HttpStatus.BAD_REQUEST);
+    }
+    //Step 3: Create OTP for DB
+    const create_opt: CreateOtpDto = {
+      value: otpInput.value,
+      type: OtpTypeEnum.register,
+      code: code_send,
+      count: count
+    }
+    //Step 4: Create data for OTP
+    const data_create = await this.otpService.create(create_opt)
+    const data = {
+      ID: data_create.ID,
+      value: data_create.value
+    }
+    return { statusCode: 201, message: 'Send mail success', data };
   }
+
+  @Post('verify/:id')
+  async verifyOTP(@Param('id') id: number, @Body() verifyOtpDto: VerifyOtpDto) {
+    const data = await this.otpService.verifyOTP(id, verifyOtpDto.type, verifyOtpDto.code)
+    if (!data) {
+      throw new HttpException(`OTP not found !`, HttpStatus.NOT_FOUND);
+    }
+    await this.otpService.update(data.value, { verify: true })
+    return { statusCode: 201, message: `OTP for ${data.value} success` };
+  }
+
+  generateOTP(length) {
+    const max = Math.pow(10, length);
+    const otp = Math.floor(Math.random() * max);
+    return otp.toString().padStart(length, '0');
+  }
+
 }

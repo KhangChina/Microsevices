@@ -15,7 +15,7 @@ export class Otp {
     @Column({default:OtpTypeEnum.register})
     type: OtpTypeEnum;
 
-    @Column({default:""})
+    @Column()
     code: string;
 
     @Column({default:0})

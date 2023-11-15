@@ -25,17 +25,17 @@ services:
     ports:
       - "3306:3306"
     networks:
-      - idetity-networks
+      - notifycation-networks
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:5.1
     restart: always
     ports:
-      - "8080:80"
+      - "8081:80"
     env_file:
       - .env
     depends_on:
       - db
     networks:
-      - idetity-networks
+      - notifycation-networks
 networks:
-  idetity-networks:
+  notifycation-networks:
