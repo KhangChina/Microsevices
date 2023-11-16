@@ -92,6 +92,10 @@ export class AuthenticationController {
       throw new HttpException(`Products ${register.productID} not found !'`, HttpStatus.NOT_FOUND);
     }
 
+    //Step 3: Check user OTP
+
+
+
     //Step 3: Mapping data
     const createUser: CreateUserDto = {
       password: register.password,

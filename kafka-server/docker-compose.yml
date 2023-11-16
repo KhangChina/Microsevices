@@ -1,0 +1,20 @@
+version: '3'
+services:
+  zookeeper:
+    image: 'confluentinc/cp-zookeeper:latest'
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: 'confluentinc/cp-kafka:latest'
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # KAFKA_USER: kafka_user
+      # KAFKA_PASSWORD: kafka_password
+      KAFKA_MESSAGE_MAX_BYTES: 2000000000 # Giá trị này tương đương với khoảng 2GB
+    ports:
+      - 9092:9092
