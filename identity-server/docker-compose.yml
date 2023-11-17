@@ -23,14 +23,14 @@ services:
       - ./initdb:/docker-entrypoint-initdb.d
       #- ./dbdata:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "3307:3306"
     networks:
       - idetity-networks
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:5.1
     restart: always
     ports:
-      - "8080:80"
+      - "8082:80"
     env_file:
       - .env
     depends_on:

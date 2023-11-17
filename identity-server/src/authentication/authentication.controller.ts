@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus,Request, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus,Request, UseGuards, UseInterceptors, Inject, OnModuleInit } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { UsersService } from 'src/users/users.service';
 import { UtilityService } from 'src/utility/utility.service';
@@ -10,15 +10,20 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { ProductsService } from 'src/products/products.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/guards/jwt-access.guard';
+import { ClientKafka } from '@nestjs/microservices';
 @ApiTags('Authentication')
 @Controller('authentication')
-export class AuthenticationController {
+export class AuthenticationController implements OnModuleInit {
   constructor(
     private readonly userService: UsersService,
     private readonly utilityService: UtilityService,
     private readonly jwtService: JwtService,
-    private readonly productService: ProductsService
+    private readonly productService: ProductsService,
+    @Inject('OTP_SERVICE') private readonly otpClient: ClientKafka,
   ) { }
+  onModuleInit() {
+    this.otpClient.subscribeToResponseOf('check_otp')
+  }
 
   @Post('login')
   async login(@Body() login: LoginDto) {
@@ -89,16 +94,23 @@ export class AuthenticationController {
     //Step 2: Check product
     const dataProducts = await this.productService.findOne(register.productID)
     if (!dataProducts) {
-      throw new HttpException(`Products ${register.productID} not found !'`, HttpStatus.NOT_FOUND);
+      throw new HttpException(`Products ${register.productID} not found !`, HttpStatus.NOT_FOUND);
     }
-
-    //Step 3: Check user OTP
-
+   
+    //Step 3: Check user OTP for microservices
+    await this.otpClient.send('check_otp',register.email).subscribe((u)=>{
+      // console.log(`Check OTP: ${u}`)
+      if(!u)
+      {
+        throw new HttpException(`User for ${register.email} not verify !`, HttpStatus.FORBIDDEN);
+      }
+    })
 
 
     //Step 3: Mapping data
+    const password = await bcrypt.hash(register.password, 10)
     const createUser: CreateUserDto = {
-      password: register.password,
+      password: password,
       username: register.username,
       full_name: register.full_name,
       email: register.email,

@@ -39,12 +39,6 @@ async function bootstrap() {
     options: {
       client: {
         brokers: ['localhost:9092'],
-        ssl: false,
-        // sasl: {
-        //   mechanism: 'plain',
-        //   username: 'kafka_user',
-        //   password: 'kafka_password',
-        // },
       },
       consumer: {
         groupId: 'notify-consumer',

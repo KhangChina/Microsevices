@@ -7,6 +7,7 @@ import { MailService } from 'src/mail/mail.service';
 import { OtpTypeEnum } from 'src/decorators/otp-type.decorator';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { count } from 'console';
+import { MessagePattern } from '@nestjs/microservices';
 
 @ApiTags('OTP')
 @Controller('otp')
@@ -93,4 +94,10 @@ export class OtpController {
     return otp.toString().padStart(length, '0');
   }
 
+  @MessagePattern('check_otp')
+  checkOTP(data : any)
+  {
+      console.log(data)
+      return true
+  }
 }
