@@ -6,7 +6,7 @@ import authConstants from './auth-constants';
 import { JwtModule } from '@nestjs/jwt';
 import { ProductsModule } from 'src/products/products.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-
+import 'dotenv/config'
 @Module({
   imports: [UsersModule, UtilityModule, ProductsModule, JwtModule.register({
     secret: authConstants.jwt.secret,
@@ -19,7 +19,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
         options: {
           client: {
             clientId: 'notify',
-            brokers: ['localhost:9092'],
+            brokers: [process.env.HOST_KAFKA],
           },
           consumer: {
             groupId: 'notify-consumer',

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus,Request, UseGuards, UseInterceptors, Inject, OnModuleInit } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus, Request, UseGuards, UseInterceptors, Inject, OnModuleInit } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { UsersService } from 'src/users/users.service';
 import { UtilityService } from 'src/utility/utility.service';
@@ -11,6 +11,7 @@ import { ProductsService } from 'src/products/products.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/guards/jwt-access.guard';
 import { ClientKafka } from '@nestjs/microservices';
+import { lastValueFrom } from 'rxjs';
 @ApiTags('Authentication')
 @Controller('authentication')
 export class AuthenticationController implements OnModuleInit {
@@ -22,7 +23,7 @@ export class AuthenticationController implements OnModuleInit {
     @Inject('OTP_SERVICE') private readonly otpClient: ClientKafka,
   ) { }
   onModuleInit() {
-    this.otpClient.subscribeToResponseOf('check_otp')
+    this.otpClient.subscribeToResponseOf('check_otp_register')
   }
 
   @Post('login')
@@ -78,17 +79,14 @@ export class AuthenticationController implements OnModuleInit {
     //Step 1: Check data
     if (register.email) {
       const checkMail = await this.userService.checkEmail(register.email)
-      if(checkMail)
-      {
-        throw new HttpException(`${register.email} already exist !`, HttpStatus.CONFLICT); 
+      if (checkMail) {
+        throw new HttpException(`${register.email} already exist !`, HttpStatus.CONFLICT);
       }
     }
-    if(register.phone)
-    {
+    if (register.phone) {
       const checkPhone = await this.userService.checkPhone(register.phone)
-      if(checkPhone)
-      {
-        throw new HttpException(`${register.phone} already exist !`, HttpStatus.CONFLICT); 
+      if (checkPhone) {
+        throw new HttpException(`${register.phone} already exist !`, HttpStatus.CONFLICT);
       }
     }
     //Step 2: Check product
@@ -96,16 +94,23 @@ export class AuthenticationController implements OnModuleInit {
     if (!dataProducts) {
       throw new HttpException(`Products ${register.productID} not found !`, HttpStatus.NOT_FOUND);
     }
-   
     //Step 3: Check user OTP for microservices
-    await this.otpClient.send('check_otp',register.email).subscribe((u)=>{
-      // console.log(`Check OTP: ${u}`)
-      if(!u)
-      {
-        throw new HttpException(`User for ${register.email} not verify !`, HttpStatus.FORBIDDEN);
-      }
-    })
 
+    let res = await lastValueFrom(this.otpClient.send('check_otp_register', register.email))
+    const verify = res.verify
+    let verified_phone = false
+    let verified_email = false
+    if (!verify) {
+      throw new HttpException(`User for ${register.email} not verify !`, HttpStatus.FORBIDDEN);
+    }
+    const dataOtp = res.data
+    const checkInputOtp = this.utilityService.checkString(dataOtp.value)
+    if (checkInputOtp.type === 'email') {
+      verified_email = true
+    }
+    if (checkInputOtp.type === 'phone') {
+      verified_phone = true
+    }
 
     //Step 3: Mapping data
     const password = await bcrypt.hash(register.password, 10)
@@ -114,9 +119,11 @@ export class AuthenticationController implements OnModuleInit {
       username: register.username,
       full_name: register.full_name,
       email: register.email,
-      phone: register.phone
+      phone: register.phone,
+      verified_phone: verified_phone,
+      verified_email: verified_email
     }
-    
+
     //Step 4: Create data user
     const data = await this.userService.create(createUser, dataProducts)
     return { statusCode: 201, message: 'User register success !', data };
@@ -126,8 +133,7 @@ export class AuthenticationController implements OnModuleInit {
   @Get('identification')
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
-  async getIdentification(@Request() req)
-  {
+  async getIdentification(@Request() req) {
     const data = await this.userService.findOne(req.user.ID)
     return { statusCode: 200, message: 'Create user success', data };
   }

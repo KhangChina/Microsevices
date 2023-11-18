@@ -41,8 +41,7 @@ export class OtpController {
     }
     //Step 2: Check mail verify
     mail_ex = await this.otpService.findOneVerifyOTP(otpInput.value, OtpTypeEnum.register)
-    if(mail_ex)
-    {
+    if (mail_ex) {
       throw new HttpException(`Email ${mail_ex.value} verified !`, HttpStatus.BAD_REQUEST);
     }
     //Step 3: Check send
@@ -94,10 +93,19 @@ export class OtpController {
     return otp.toString().padStart(length, '0');
   }
 
-  @MessagePattern('check_otp')
-  checkOTP(data : any)
-  {
-      console.log(data)
-      return true
+  @MessagePattern('check_otp_register')
+  async checkOTPRegister(data: any) {
+    const res = await this.otpService.findOneVerifyOTP(data, OtpTypeEnum.register)
+    if (res) {
+      return JSON.stringify ({
+        verify: true,
+        data: res
+      })
+    }
+    else
+    return JSON.stringify( {
+        verify: false,
+        data: null
+      })
   }
 }
