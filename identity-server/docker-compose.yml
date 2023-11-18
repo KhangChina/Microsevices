@@ -1,18 +1,18 @@
 version: '3.9'
 services:
-  # app:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   restart: always
-  #   volumes:
-  #     - ./src:/usr/src/app/src
-  #   ports:
-  #     - "3000:3000"
-  #   depends_on:
-  #     - db
-  #   networks:
-  #     - idetity-networks
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+    #  - ./src:/usr/src/app/src
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - idetity-networks
   db:
     image: mariadb:10.6
     restart: always
