@@ -2,6 +2,7 @@ version: '3'
 services:
   kong-database:
     image: postgres:9.6
+    restart: always
     env_file:
       - .env
     volumes:
@@ -17,9 +18,9 @@ services:
 
   kong:
     image: kong:latest
+    restart: always
     env_file:
       - .env
-    restart: always
     volumes:
       - ./data_kong_config:/etc/kong
     depends_on:
@@ -38,6 +39,7 @@ services:
 
   konga:
     image: pantsel/konga:latest
+    restart: always
     volumes:
       - ./data_konga:/app/konga.db
     depends_on:
