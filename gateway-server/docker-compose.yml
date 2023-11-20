@@ -3,14 +3,14 @@ services:
   kong-database:
     image: postgres:9.6
     env_file:
-      - .env.dev
+      - .env
     volumes:
       - ./data_kong:/var/lib/postgresql/data
 
   kong-migrations:
     image: kong:latest
     env_file:
-      - .env.dev
+      - .env
     command: "kong migrations bootstrap"
     depends_on:
       - kong-database
@@ -18,7 +18,7 @@ services:
   kong:
     image: kong:latest
     env_file:
-      - .env.dev
+      - .env
     restart: always
     volumes:
       - ./data_kong_config:/etc/kong
