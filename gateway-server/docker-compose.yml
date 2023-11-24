@@ -7,6 +7,8 @@ services:
       - .env
     volumes:
       - ./data_kong:/var/lib/postgresql/data
+    networks:
+      - kong-net
 
   kong-migrations:
     image: kong:latest
@@ -15,10 +17,12 @@ services:
     command: "kong migrations bootstrap"
     depends_on:
       - kong-database
+    networks:
+      - kong-net
 
   kong:
     image: kong:latest
-    restart: always
+    # restart: always
     env_file:
       - .env
     volumes:
@@ -36,15 +40,28 @@ services:
       - "8443:8443"
       - "8001:8001"
       - "8444:8444"
+    networks:
+      - kong-net
 
   konga:
-    image: pantsel/konga:latest
-    restart: always
+    image: pantsel/konga
+    # image: konga:1.3
+    # restart: always
     volumes:
-      - ./data_konga:/app/konga.db
+      - ./data_konga:/app/kongadata
+      - ./konga/api/policies/createUser.js:/app/api/policies/createUser.js
+      - ./certs:/app/certs
     depends_on:
       - kong
     ports:
       - "1337:1337"
     environment:
       NODE_ENV: production
+      SSL_KEY_PATH: /app/certs/localhost.key
+      SSL_CRT_PATH: /app/certs/localhost.crt
+    networks:
+      - kong-net
+
+networks:
+  kong-net:
+    driver: bridge
