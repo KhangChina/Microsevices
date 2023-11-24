@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, Query, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -31,7 +31,19 @@ export class UsersController {
     if (!dataProducts) {
       return { statusCode: 404, message: 'Products not found' };
     }
-    
+    //Step 1: Check data
+    if (createUserDto.email) {
+      const checkMail = await this.usersService.checkEmail(createUserDto.email)
+      if (checkMail) {
+        throw new HttpException(`${createUserDto.email} already exist !`, HttpStatus.CONFLICT);
+      }
+    }
+    if (createUserDto.phone) {
+      const checkPhone = await this.usersService.checkPhone(createUserDto.phone)
+      if (checkPhone) {
+        throw new HttpException(`${createUserDto.phone} already exist !`, HttpStatus.CONFLICT);
+      }
+    }
     //Step 3: Create hash password
     createUserDto.password = await bcrypt.hash(createUserDto.password, 10)
     //Step 3: Save user
