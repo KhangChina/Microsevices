@@ -1,23 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateInformationExtendDto } from './dto/create-information-extend.dto';
 import { UpdateInformationExtendDto } from './dto/update-information-extend.dto';
+import { InformationExtend } from './entities/information-extend.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class InformationExtendService {
-  create(createInformationExtendDto: CreateInformationExtendDto) {
-    return 'This action adds a new informationExtend';
+  @InjectRepository(InformationExtend) private informationExtendRepository: Repository<InformationExtend>
+  async create(createInformationExtendDto: CreateInformationExtendDto) {
+    try {
+      return await this.informationExtendRepository.save(createInformationExtendDto)
+    } catch (error) {
+      throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  findAll() {
+  findAll(page: number, limit: number, search: string) {
     return `This action returns all informationExtend`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} informationExtend`;
+  async findOne(ID: string) {
+    try {
+      return await this.informationExtendRepository.findOne({ where: { ID: ID } });
+    } catch (error) {
+      throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  update(id: number, updateInformationExtendDto: UpdateInformationExtendDto) {
-    return `This action updates a #${id} informationExtend`;
+  async findOneByIDPatient(IDPatient: string)
+  {
+    try {
+      return await this.informationExtendRepository.findOne({ where: { IDPatient: IDPatient } });
+    } catch (error) {
+      throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async update(ID: string, updateInformationExtendDto: UpdateInformationExtendDto) {
+    try {
+      return await this.informationExtendRepository.update(ID, updateInformationExtendDto);
+    } catch (error) {
+      throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   remove(id: number) {

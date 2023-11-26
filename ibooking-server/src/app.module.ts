@@ -3,6 +3,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { InformationExtendModule } from './information-extend/information-extend.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { InformationInsuranceModule } from './information-insurance/information-insurance.module';
+import { InformationEnterpriseModule } from './information-enterprise/information-enterprise.module';
 import 'dotenv/config'
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -16,7 +18,7 @@ import 'dotenv/config'
     synchronize: true, //Create new tb and lose data
     logging:  false,
     autoLoadEntities: true,
-  }),InformationExtendModule],
+  }),InformationExtendModule, InformationInsuranceModule, InformationEnterpriseModule],
   controllers: [AppController],
   providers: [AppService],
 })
