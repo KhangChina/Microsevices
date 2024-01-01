@@ -38,13 +38,13 @@ export class ProductsController {
 
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    const data = await this.productsService.update(+id, updateProductDto);
+    const data = await this.productsService.update(id, updateProductDto);
     return { statusCode: 200, message: 'update data success', data: data };
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    const data = await this.productsService.remove(+id);
+    const data = await this.productsService.remove(id);
     return { statusCode: 200, message: 'Delete data success', data: data };
   }
 }

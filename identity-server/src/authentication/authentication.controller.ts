@@ -70,7 +70,7 @@ export class AuthenticationController implements OnModuleInit {
       accessToken,
       refreshToken
     }
-    return { statusCode: 201, message: 'User login success', data };
+    return { statusCode: 200, message: 'User login success', data };
   }
 
   @Post('register')

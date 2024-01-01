@@ -38,14 +38,15 @@ export class ProductsService {
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  async update(ID: number, updateProductDto: UpdateProductDto) {
+  async update(ID: string, updateProductDto: UpdateProductDto) {
     try {
       return await this.productRepository.update(ID, updateProductDto);
     } catch (error) {
+      console.log(error)
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
- async remove(ID: number) {
+ async remove(ID: string) {
     try {
       return await this.productRepository.delete(ID);
     } catch (error) {
