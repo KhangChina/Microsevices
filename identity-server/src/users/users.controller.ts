@@ -60,7 +60,7 @@ export class UsersController {
     const page: number = query.page > 0 ? query.page : 1
     const limit: number = query.per_page ? query.per_page : 20
     const data = await this.usersService.findAll(page, limit, search);
-    return { statusCode: 201, message: 'Get data success', data };
+    return { statusCode: 200, message: 'Get data success', data };
   }
 
   @Get(':id')
