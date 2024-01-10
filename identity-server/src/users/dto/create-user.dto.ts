@@ -1,5 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { IsBoolean, IsEmail, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength } from "class-validator";
+import { UserStatusEnum } from "src/decorators/userStatus.decorator";
 
 export class CreateUserDto {
 
@@ -40,5 +41,5 @@ export class CreateUserDto {
     @IsOptional()
     @IsBoolean()
     verified_email: boolean
-
 }
+
