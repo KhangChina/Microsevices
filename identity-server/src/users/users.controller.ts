@@ -81,4 +81,15 @@ export class UsersController {
     return { statusCode: 200, message: 'Delete data success', data };
   }
   
+  @Patch(':id/product/:idProduct')
+  async updateProductForUser(@Param('id') id: string, @Param('idProduct') idProduct: string) {
+    //Step 1: Get product
+    const dataProduct = await this.productService.findOne(idProduct)
+    if (!dataProduct) {
+      return { statusCode: 404, message: 'Products not found' };
+    }
+     //Step 2: Update product
+    const data = await this.usersService.updateProductForUser(+id,dataProduct);
+    return { statusCode: 200, message: 'Update user success', data };
+  }
 }

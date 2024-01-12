@@ -6,7 +6,8 @@ export class User {
 
     @PrimaryGeneratedColumn()
     ID: number;
-
+    
+    //One user for multiple products
     @ManyToMany(() => Product)
     @JoinTable()
     products: Product[]

@@ -64,7 +64,7 @@ export class UsersService {
     }
   }
 
-  async checkUserNameAndPassword(username: string,productID: string) {
+  async checkUserNameAndPassword(username: string, productID: string) {
     try {
       const lstProductID = [productID]
       const status = UserStatusEnum.active
@@ -98,7 +98,7 @@ export class UsersService {
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  async checkPhoneAndPassword(phone: string,productID: string) {
+  async checkPhoneAndPassword(phone: string, productID: string) {
     try {
       const lstProductID = [productID]
       const status = UserStatusEnum.active
@@ -116,8 +116,7 @@ export class UsersService {
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  async checkEmail(email: string)
-  {
+  async checkEmail(email: string) {
     try {
       return await this.userRepository.findOne({
         where: { email: email }
@@ -126,8 +125,7 @@ export class UsersService {
 
     } throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
   }
-  async checkPhone(phone: string)
-  {
+  async checkPhone(phone: string) {
     try {
       return await this.userRepository.findOne({
         where: { phone: phone }
@@ -135,5 +133,13 @@ export class UsersService {
     } catch (error) {
 
     } throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
+  }
+  async updateProductForUser(idUser: number, product: Product) {
+    try {
+      return await this.userRepository.update(idUser, { products: [product] });
+    }
+    catch (error) {
+      throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }
