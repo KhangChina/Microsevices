@@ -1,6 +1,7 @@
 import { ProductStatusEnum } from "src/decorators/productStatus.decorator";
+import { UserProduct } from "src/user_product/entities/user_product.entity";
 import { User } from "src/users/entities/user.entity";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity({ name: "product" })
 export class Product {
@@ -21,4 +22,7 @@ export class Product {
 
     @UpdateDateColumn()
     update_at: Date
+
+    @OneToMany(() => UserProduct, userProduct => userProduct.products)
+    userProducts: UserProduct[];
 }

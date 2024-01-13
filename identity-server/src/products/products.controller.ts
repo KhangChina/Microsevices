@@ -35,7 +35,6 @@ export class ProductsController {
       return { statusCode: 200, message: 'Get data success', data: data };
     return { statusCode: 404, message: 'Get data not found' };
   }
-
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
     const data = await this.productsService.update(id, updateProductDto);

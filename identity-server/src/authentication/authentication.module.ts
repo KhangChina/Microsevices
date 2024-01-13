@@ -7,8 +7,9 @@ import { JwtModule } from '@nestjs/jwt';
 import { ProductsModule } from 'src/products/products.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import 'dotenv/config'
+import { UserProductModule } from 'src/user_product/user_product.module';
 @Module({
-  imports: [UsersModule, UtilityModule, ProductsModule, JwtModule.register({
+  imports: [UsersModule, UtilityModule, ProductsModule, UserProductModule, JwtModule.register({
     secret: authConstants.jwt.secret,
     signOptions: { expiresIn: authConstants.jwt.expirationTime.accessToken },
   }),

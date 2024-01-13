@@ -7,13 +7,21 @@ import { Brackets, Repository } from 'typeorm';
 import { paginate } from 'nestjs-typeorm-paginate';
 import { UserStatusEnum } from 'src/decorators/userStatus.decorator';
 import { Product } from 'src/products/entities/product.entity';
+import { UserProduct } from 'src/user_product/entities/user_product.entity';
 
 @Injectable()
 export class UsersService {
   @InjectRepository(User) private userRepository: Repository<User>
-  async create(createUserDto: CreateUserDto, product: Product) {
+  async create(createUserDto: CreateUserDto) {
     try {
-      return await this.userRepository.save({ ...createUserDto, products: [product] })
+      return await this.userRepository.save(createUserDto)
+    } catch (error) {
+      throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+  async createProductForAdmin(createUserDto: CreateUserDto) {
+    try {
+      return await this.userRepository.save({ ...createUserDto })
     } catch (error) {
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -38,9 +46,7 @@ export class UsersService {
   async findOne(ID: number) {
     try {
       return await this.userRepository.findOne({
-        where: { ID: ID }, relations: {
-          products: true,
-        },
+        where: { ID: ID }
       })
     } catch (error) {
 
@@ -134,11 +140,13 @@ export class UsersService {
 
     } throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
   }
-  async updateProductForUser(idUser: number, product: Product) {
+  async getProductForUser(idUser: number) {
     try {
-      return await this.userRepository.update(idUser, { products: [product] });
+      const data = await this.userRepository.findOne({ where: { ID: idUser },  relations: ["userProducts","userProducts.products"] });
+      return data
     }
     catch (error) {
+      console.log(error)
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

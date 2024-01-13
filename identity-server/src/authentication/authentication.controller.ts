@@ -12,6 +12,9 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from 'src/guards/jwt-access.guard';
 import { ClientKafka } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
+import { UserProductService } from 'src/user_product/user_product.service';
+import { User } from 'src/users/entities/user.entity';
+import { CreateUserProductDto } from 'src/user_product/dto/create-user_product.dto';
 @ApiTags('Authentication')
 @Controller('authentication')
 export class AuthenticationController implements OnModuleInit {
@@ -20,6 +23,7 @@ export class AuthenticationController implements OnModuleInit {
     private readonly utilityService: UtilityService,
     private readonly jwtService: JwtService,
     private readonly productService: ProductsService,
+    private readonly user_productService : UserProductService,
     @Inject('OTP_SERVICE') private readonly otpClient: ClientKafka,
   ) { }
   onModuleInit() {
@@ -125,7 +129,14 @@ export class AuthenticationController implements OnModuleInit {
     }
 
     //Step 4: Create data user
-    const data = await this.userService.create(createUser, dataProducts)
+    const data : User = await this.userService.create(createUser)
+    
+    //Step 5: Update User for product
+    const createUserProduct : CreateUserProductDto = {
+      products: dataProducts,
+      users: data
+    }
+    await this.user_productService.create(createUserProduct)
     return { statusCode: 201, message: 'User register success !', data };
 
   }

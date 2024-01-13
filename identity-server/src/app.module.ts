@@ -6,6 +6,7 @@ import { ProductsModule } from './products/products.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { UtilityModule } from './utility/utility.module';
+import { UserProductModule } from './user_product/user_product.module';
 import 'dotenv/config'
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -20,7 +21,7 @@ import 'dotenv/config'
     logging:  false,
     autoLoadEntities: true,
   }),
-  UsersModule, ProductsModule, AuthenticationModule, UtilityModule],
+  UsersModule, ProductsModule, AuthenticationModule, UtilityModule, UserProductModule],
   controllers: [AppController],
   providers: [AppService],
 })
