@@ -14,15 +14,16 @@ export class UserProductService {
     return await this.user_productRepository.save(createUserProductDto)
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} userProduct`;
+  async findOne(user_id: string, product_id: string) {
+    return await this.user_productRepository.findOne({ where: { user_id, product_id } })
   }
 
-  update(id: number, updateUserProductDto: UpdateUserProductDto) {
+  async update(id: number, updateUserProductDto: UpdateUserProductDto) {
     return `This action updates a #${id} userProduct`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} userProduct`;
+  async remove(user_id: string, product_id: string) {
+    const data =  await this.user_productRepository.findOne({ where: { user_id, product_id } })
+    return await this.user_productRepository.delete(data.ID)
   }
 }

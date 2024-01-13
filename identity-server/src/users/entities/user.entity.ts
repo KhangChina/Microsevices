@@ -5,8 +5,8 @@ import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, Ma
 @Entity({ name: "user" })
 export class User {
 
-    @PrimaryGeneratedColumn()
-    ID: number;
+    @PrimaryGeneratedColumn('uuid')
+    ID: string;
         
     @Column({ default: ""})
     password: string;

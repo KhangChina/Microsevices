@@ -38,12 +38,12 @@ export class UsersService {
           .orWhere("u.status like :search", { search: `%${search}%` })
       }));
       queryBuilder.orderBy('u.create_at', 'DESC')
-      return paginate<User>(queryBuilder, { page, limit });
+      return paginate<User>(queryBuilder, { page, limit })
     } catch (error) {
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  async findOne(ID: number) {
+  async findOne(ID: string) {
     try {
       return await this.userRepository.findOne({
         where: { ID: ID }
@@ -53,32 +53,27 @@ export class UsersService {
     } throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
 
   }
-
-  async update(ID: number, updateUserDto: UpdateUserDto) {
+  async update(ID: string, updateUserDto: UpdateUserDto) {
     try {
       return await this.userRepository.update(ID, updateUserDto);
     } catch (error) {
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
-  async remove(ID: number) {
+  async remove(ID: string) {
     try {
       return await this.userRepository.delete(ID);
     } catch (error) {
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
   async checkUserNameAndPassword(username: string, productID: string) {
     try {
-      const lstProductID = [productID]
       const status = UserStatusEnum.active
       const user = await this.userRepository
         .createQueryBuilder("user")
-        .leftJoinAndSelect("user.products", "product")
+        .innerJoinAndSelect("user.userProducts", "product", "product.product_id = :productID", { productID })
         .where("user.username = :username", { username })
-        .andWhere("product.ID IN (:...lstProductID)", { lstProductID })
         .andWhere("user.status = :status", { status })
         .getOne();
       return user;
@@ -88,32 +83,29 @@ export class UsersService {
   }
   async checkEmailAndPassword(email: string, productID: string) {
     try {
-      const lstProductID = [productID]
       const status = UserStatusEnum.active
       const verified_email = true
       const user = await this.userRepository
         .createQueryBuilder("user")
-        .leftJoinAndSelect("user.products", "product")
+        .innerJoinAndSelect("user.userProducts", "product", "product.product_id = :productID", { productID })
         .where("user.email = :email", { email })
-        .andWhere("product.ID IN (:...lstProductID)", { lstProductID })
         .andWhere("user.status = :status", { status })
         .andWhere("user.verified_email = :verified_email", { verified_email })
         .getOne();
       return user;
     } catch (error) {
+      console.log(error)
       throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
   async checkPhoneAndPassword(phone: string, productID: string) {
     try {
-      const lstProductID = [productID]
       const status = UserStatusEnum.active
       const verified_phone = true
       const user = await this.userRepository
         .createQueryBuilder("user")
-        .leftJoinAndSelect("user.products", "product")
+        .innerJoinAndSelect("user.userProducts", "product", "product.product_id = :productID", { productID })
         .where("user.phone = :phone", { phone })
-        .andWhere("product.ID IN (:...lstProductID)", { lstProductID })
         .andWhere("user.status = :status", { status })
         .andWhere("user.verified_phone = :verified_phone", { verified_phone })
         .getOne();
@@ -140,7 +132,7 @@ export class UsersService {
 
     } throw new HttpException('Server Problem !', HttpStatus.INTERNAL_SERVER_ERROR);
   }
-  async getProductForUser(idUser: number) {
+  async getProductForUser(idUser: string) {
     try {
       const data = await this.userRepository.findOne({ where: { ID: idUser },  relations: ["userProducts","userProducts.products"] });
       return data

@@ -54,17 +54,17 @@ export class UsersController {
   }
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const data = await this.usersService.findOne(+id);
+    const data = await this.usersService.findOne(id);
     return { statusCode: 200, message: 'Get one data success', data };
   }
   @Patch(':id')
   async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    const data = await this.usersService.update(+id, updateUserDto);
+    const data = await this.usersService.update(id, updateUserDto);
     return { statusCode: 200, message: 'Update data success', data };
   }
   @Delete(':id')
   remove(@Param('id') id: string) {
-    const data = this.usersService.remove(+id);
+    const data = this.usersService.remove(id);
     return { statusCode: 200, message: 'Delete data success', data };
   }
   @Patch(':id/product/:idProduct')
@@ -75,7 +75,7 @@ export class UsersController {
       throw new HttpException('Products not found!', HttpStatus.NOT_FOUND);
     }
     //Step 2: Get product user
-    const dataUser = await this.usersService.findOne(+id);
+    const dataUser = await this.usersService.findOne(id);
     if (!dataUser) {
       throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
     }
@@ -89,10 +89,16 @@ export class UsersController {
   }
   @Get(':id/product')
   async findAllProductByUser(@Param('id') id: string) {
-    const user = await this.usersService.getProductForUser(+id)
+    const user = await this.usersService.getProductForUser(id)
     const products = user.userProducts.map(userProduct => userProduct.products);
     if (products)
       return { statusCode: 200, message: 'Get data success', data: { "items": products } };
     throw new HttpException('Products not found!', HttpStatus.NOT_FOUND);
+  }
+  @Delete(':id/product/:idProduct')
+  async removeUserProduct(@Param('id') id: string, @Param('idProduct') idProduct: string)
+  {
+    const data = await this.user_productService.remove(id, idProduct)
+    return { statusCode: 200, message: 'Delete data success', data };
   }
 }
