@@ -1,0 +1,17 @@
+# version: '3.9'
+# services:
+#   app:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     volumes:
+#       - ./src:/usr/src/app/src
+#     ports:
+#       - "3000:3000"
+#     depends_on:
+#       - db
+#     networks:
+#       - log-networks
+# networks:
+#   log-networks:
+
